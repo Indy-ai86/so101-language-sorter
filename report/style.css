@@ -1,0 +1,14 @@
+@page { size: A4; margin: 18mm 16mm; }
+body { font-family: "Hiragino Sans", sans-serif; font-size: 10pt; line-height: 1.7; color: #1b1b1b; }
+header#title-block-header { margin-bottom: 1.2em; }
+h1.title { font-size: 19pt; margin: 0 0 .2em; }
+p.subtitle { font-size: 11pt; color: #52514e; margin: 0; }
+p.author, p.date { font-size: 9.5pt; color: #52514e; margin: .1em 0; }
+h1 { font-size: 13pt; border-bottom: 1px solid #c3c2b7; padding-bottom: 2px; margin-top: 1.4em; }
+table { border-collapse: collapse; width: 100%; font-size: 8.8pt; margin: .6em 0 1em; page-break-inside: avoid; }
+th, td { border: 1px solid #d6d5cf; padding: 3px 6px; vertical-align: top; }
+th { background: #f1f0ec; }
+figure { margin: .8em 0; text-align: center; page-break-inside: avoid; }
+figcaption { font-size: 8.5pt; color: #52514e; }
+code, pre { font-family: Menlo, monospace; font-size: 8.5pt; }
+pre { background: #f4f3ef; padding: 8px; border-radius: 4px; }

@@ -1,0 +1,36 @@
+{
+  "id": "20261024-195322",
+  "timestamp": "2026-10-24T19:53:22",
+  "note": "初回の掴み試験（dry-run）",
+  "image": "runs/20261024/195322/frame.jpg",
+  "table_cm": [
+    22,
+    15
+  ],
+  "objects": [
+    {
+      "colors": [
+        "yellow"
+      ],
+      "shape": "round",
+      "circularity": 0.877,
+      "area_px": 1223,
+      "pixel": [
+        274.4,
+        231.1
+      ],
+      "bbox": [
+        254,
+        212,
+        42,
+        39
+      ],
+      "id": "o1",
+      "table_cm": [
+        11.5,
+        7.9
+      ],
+      "kind": null
+    }
+  ]
+}

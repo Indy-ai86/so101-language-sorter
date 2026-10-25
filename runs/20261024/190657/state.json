@@ -1,0 +1,108 @@
+{
+  "id": "20261024-190657",
+  "timestamp": "2026-10-24T19:06:57",
+  "note": "配置5（黒い箱2つ）",
+  "image": "runs/20261024/190657/frame.jpg",
+  "table_cm": [
+    22,
+    15
+  ],
+  "objects": [
+    {
+      "colors": [
+        "yellow"
+      ],
+      "shape": "round",
+      "circularity": 0.815,
+      "area_px": 1261,
+      "pixel": [
+        190.4,
+        279.9
+      ],
+      "bbox": [
+        168,
+        261,
+        44,
+        39
+      ],
+      "id": "o1",
+      "table_cm": [
+        4.2,
+        12.4
+      ],
+      "kind": null
+    },
+    {
+      "colors": [
+        "black"
+      ],
+      "shape": "angular",
+      "circularity": 0.601,
+      "area_px": 3250,
+      "pixel": [
+        228.8,
+        195.2
+      ],
+      "bbox": [
+        193,
+        172,
+        73,
+        47
+      ],
+      "id": "o2",
+      "table_cm": [
+        7.2,
+        4.9
+      ],
+      "kind": null
+    },
+    {
+      "colors": [
+        "black"
+      ],
+      "shape": "angular",
+      "circularity": 0.619,
+      "area_px": 3094,
+      "pixel": [
+        342.3,
+        279.6
+      ],
+      "bbox": [
+        319,
+        244,
+        47,
+        72
+      ],
+      "id": "o3",
+      "table_cm": [
+        17.8,
+        11.9
+      ],
+      "kind": null
+    },
+    {
+      "colors": [
+        "pink"
+      ],
+      "shape": "round",
+      "circularity": 0.878,
+      "area_px": 1255,
+      "pixel": [
+        343.2,
+        196.5
+      ],
+      "bbox": [
+        323,
+        177,
+        42,
+        40
+      ],
+      "id": "o4",
+      "table_cm": [
+        17.6,
+        4.6
+      ],
+      "kind": null
+    }
+  ]
+}

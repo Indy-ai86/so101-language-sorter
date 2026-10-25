@@ -1,0 +1,1 @@
+{"state_id": "20261025-122013", "rule_id": "r03", "rule": "黄色の物は右へ。青い物は左へ。それ以外は中央へ。", "backend": "fable", "answer": {"o1": {"bin": "center", "confidence": 0.95}}, "model": "claude-fable-5-1", "cost_usd": 0.019914499999999998, "latency_s": 3.74}

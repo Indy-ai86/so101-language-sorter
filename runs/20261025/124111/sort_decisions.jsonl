@@ -1,0 +1,1 @@
+{"state_id": "20261025-124111", "rule_id": "r09", "rule": "信号機の色に従って、止まれの色は左、注意の色は中央、進めの色は右へ。", "backend": "fable", "answer": {"o1": {"bin": "right", "confidence": 0.95}, "o2": {"bin": "center", "confidence": 0.95}, "o3": {"bin": "left", "confidence": 0.4}}, "model": "claude-fable-5-1", "cost_usd": 0.036869, "latency_s": 7.02}

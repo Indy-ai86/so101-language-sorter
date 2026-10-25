@@ -1,0 +1,36 @@
+{
+  "id": "20261024-190950",
+  "timestamp": "2026-10-24T19:09:50",
+  "note": "配置8",
+  "image": "runs/20261024/190950/frame.jpg",
+  "table_cm": [
+    22,
+    15
+  ],
+  "objects": [
+    {
+      "colors": [
+        "yellow"
+      ],
+      "shape": "round",
+      "circularity": 0.845,
+      "area_px": 1191,
+      "pixel": [
+        269.0,
+        225.4
+      ],
+      "bbox": [
+        248,
+        207,
+        42,
+        38
+      ],
+      "id": "o1",
+      "table_cm": [
+        11.0,
+        7.4
+      ],
+      "kind": null
+    }
+  ]
+}

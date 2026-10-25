@@ -1,0 +1,69 @@
+camera:
+  index: 0            # 外付け USB カメラ。1 は MacBook 内蔵
+  width: 640
+  height: 480
+  warmup_frames: 10   # 起動直後は露出が安定しないので数枚捨てる
+
+# 俯瞰カメラで写す机の範囲（四隅の印の内側）。座標変換の基準になる
+table_cm:
+  width: 22
+  height: 15
+
+calib_file: calib.json
+runs_dir: runs
+
+detect:
+  min_area_px: 150
+  round_circularity: 0.70   # 外接円を埋める割合がこれ以上なら round（円≈1、正方形≈0.64。淡い色の物は輪郭が欠けて 0.75 前後まで下がる）
+  # 多色の物体（2色のボールなど）を1つにまとめるか。単色の物だけなら false（接して置いた別の物がまとまるのを防ぐ）
+  merge_multicolor: false   # true は横に接して並べた別の物までまとめることがある（未解決）
+  merge_dist_px: 4          # まとめるときの外接矩形の余白（px）
+  merge_min_solidity: 0.92  # まとめた形が凸包をこれ以上埋めていれば同じ物とみなす
+
+# OpenCV の HSV（H は 0〜179）。赤は 0 付近と 179 付近にまたがるので2範囲
+# ピンクと赤は色相が重なる（実測のピンクのアヒルは H 142〜175）ので、彩度 170 を境に分ける
+colors:
+  red:    [[[0, 170, 80], [8, 255, 255]], [[170, 170, 80], [179, 255, 255]]]
+  pink:   [[[140, 50, 70], [179, 169, 255]]]
+  orange: [[[9, 120, 120], [20, 255, 255]]]
+  yellow: [[[21, 100, 120], [34, 255, 255]]]
+  # 淡い緑（実測 S 15〜34）も拾うため彩度の下限を低くする。白い紙は H 113 前後なので色相で除外できる
+  green:  [[[35, 12, 80], [90, 255, 255]]]
+  blue:   [[[90, 100, 60], [130, 255, 255]]]
+  # 黒は色相が定まらないので明るさだけで判定する（実測の黒い箱は V 14〜24、紙は影でも V 84 以上）
+  black:  [[[0, 0, 0], [179, 255, 50]]]
+
+bins: [left, center, right]
+
+decide:
+  backend: fable
+  fable_model: claude-fable-5-1
+  timeout_s: 60
+
+arm:
+  follower_port: /dev/tty.usbmodem5B7B0153431
+  follower_id: yang_follower_arm
+  leader_port: /dev/tty.usbmodem5B7B0142121
+  leader_id: yin_leader_arm
+  poses_file: poses.json
+  hz: 30
+  max_speed_deg_s: 45        # 自動で動かすときの関節の最高速度。慣れるまで低めに
+  max_step_deg: 8            # 1 回の指令で動かす上限（急な飛びを防ぐ）
+  # 掴む姿勢から肩（shoulder_lift）をこの角度ずらして持ち上げる。符号は teach.py --test-lift で確かめる
+  hover_lift_deg: -12
+  carry_lift_deg: -45
+  # 置き場の真上に寄ってから下ろす高さ（カップの縁をかすめないように）
+  bin_hover_deg: -25
+  # 掴む姿勢を記録する方眼の点（cm）。x は画像の左→右、y は上→下
+  grid_x: [3, 11, 19]
+  grid_y: [3, 7.5, 12]
+  # 記録時の開き（32）だと爪の隙間がアヒルとほぼ同じで、位置が 5mm ずれると掴めない。近づくときはここまで開く（0=閉・100=全開）
+  gripper_open: 70
+  # カップの中で離すときの開き。広げすぎると縁に当たるので、落ちる最小限にする
+  gripper_release: 35
+  # 記録した姿勢が狙いの点から一定にずれているとき、物体の位置をこの分だけずらしてから補間する（check_grasp.py で測る）
+  grasp_offset_cm: [0.5, 0.0]
+  # 掴む高さが足りないとき、肩をこの角度だけ下げる（正で下がる。1 度でおよそ 4mm。下げすぎると机を押すので少しずつ）
+  grasp_lower_deg: 0
+  # 記録した閉じ値（アヒルを握った状態で読んだ値）をそのまま指令すると押す力が出ず、握りが甘い。この分だけ深く閉じる
+  grip_squeeze: 8

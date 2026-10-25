@@ -1,0 +1,36 @@
+{
+  "id": "20261025-104615",
+  "timestamp": "2026-10-25T10:46:15",
+  "note": "再キャリブ後の確認",
+  "image": "runs/20261025/104615/frame.jpg",
+  "table_cm": [
+    22,
+    15
+  ],
+  "objects": [
+    {
+      "colors": [
+        "pink"
+      ],
+      "shape": "round",
+      "circularity": 0.88,
+      "area_px": 1291,
+      "pixel": [
+        259.4,
+        233.0
+      ],
+      "bbox": [
+        238,
+        213,
+        42,
+        41
+      ],
+      "id": "o1",
+      "table_cm": [
+        10.7,
+        7.6
+      ],
+      "kind": null
+    }
+  ]
+}

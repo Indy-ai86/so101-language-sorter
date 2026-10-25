@@ -1,0 +1,60 @@
+{
+  "id": "20261024-185828",
+  "timestamp": "2026-10-24T18:58:28",
+  "note": "ケーブル退避後",
+  "image": "runs/20261024/185828/frame.jpg",
+  "table_cm": [
+    22,
+    15
+  ],
+  "objects": [
+    {
+      "colors": [
+        "pink"
+      ],
+      "shape": "round",
+      "circularity": 0.893,
+      "area_px": 1549,
+      "pixel": [
+        213.1,
+        185.3
+      ],
+      "bbox": [
+        191,
+        164,
+        45,
+        45
+      ],
+      "id": "o1",
+      "table_cm": [
+        5.8,
+        4.1
+      ],
+      "kind": null
+    },
+    {
+      "colors": [
+        "yellow"
+      ],
+      "shape": "round",
+      "circularity": 0.858,
+      "area_px": 1161,
+      "pixel": [
+        350.3,
+        279.3
+      ],
+      "bbox": [
+        332,
+        259,
+        38,
+        41
+      ],
+      "id": "o2",
+      "table_cm": [
+        18.5,
+        11.9
+      ],
+      "kind": null
+    }
+  ]
+}

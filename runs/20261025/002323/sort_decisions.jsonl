@@ -1,0 +1,3 @@
+{"state_id": "20261025-002323", "rule_id": "r01", "rule": "ピンクを含む物は左へ。それ以外は右へ。", "backend": "fable", "answer": {"o1": {"bin": "left", "confidence": 0.98}}, "model": "claude-fable-5-1", "cost_usd": 0.0192145, "latency_s": 3.69}
+{"state_id": "20261025-002323", "rule_id": "r01", "rule": "ピンクを含む物は左へ。それ以外は右へ。", "backend": "fable", "answer": {"o1": {"bin": "left", "confidence": 0.98}}, "model": "claude-fable-5-1", "cost_usd": 0.01246225, "latency_s": 6.66}
+{"state_id": "20261025-002323", "rule_id": "r01", "rule": "ピンクを含む物は左へ。それ以外は右へ。", "backend": "fable", "answer": {"o1": {"bin": "left", "confidence": 0.97}}, "model": "claude-fable-5-1", "cost_usd": 0.01228225, "latency_s": 6.44}

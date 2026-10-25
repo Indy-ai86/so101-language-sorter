@@ -1,0 +1,12 @@
+__pycache__/
+.DS_Store
+# 姿勢と校正の控え（作業中のやり直し用）
+poses.*.json
+calib.before_*.json
+calib_frame.before_*.jpg
+teach_map.jpg
+# 撮影画像は容量が大きいので、記録（JSON）だけを公開する
+runs/**/*.jpg
+# 動画は別に提出する
+video/out/
+report/report.html

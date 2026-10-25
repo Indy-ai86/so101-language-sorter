@@ -1,0 +1,1 @@
+{"state_id": "20261025-121041", "rule_id": "r01", "rule": "ピンクを含む物は左へ。それ以外は右へ。", "backend": "fable", "answer": {"o1": {"bin": "left", "confidence": 0.97}}, "model": "claude-fable-5-1", "cost_usd": 0.0192945, "latency_s": 4.05}

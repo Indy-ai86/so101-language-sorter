@@ -1,0 +1,84 @@
+{
+  "id": "20261024-190813",
+  "timestamp": "2026-10-24T19:08:13",
+  "note": "配置6",
+  "image": "runs/20261024/190813/frame.jpg",
+  "table_cm": [
+    22,
+    15
+  ],
+  "objects": [
+    {
+      "colors": [
+        "yellow"
+      ],
+      "shape": "round",
+      "circularity": 0.88,
+      "area_px": 1349,
+      "pixel": [
+        206.1,
+        183.1
+      ],
+      "bbox": [
+        186,
+        162,
+        43,
+        42
+      ],
+      "id": "o1",
+      "table_cm": [
+        5.2,
+        3.9
+      ],
+      "kind": null
+    },
+    {
+      "colors": [
+        "green"
+      ],
+      "shape": "round",
+      "circularity": 0.849,
+      "area_px": 1075,
+      "pixel": [
+        276.3,
+        189.9
+      ],
+      "bbox": [
+        259,
+        172,
+        37,
+        36
+      ],
+      "id": "o2",
+      "table_cm": [
+        11.5,
+        4.2
+      ],
+      "kind": null
+    },
+    {
+      "colors": [
+        "pink"
+      ],
+      "shape": "round",
+      "circularity": 0.879,
+      "area_px": 1270,
+      "pixel": [
+        343.5,
+        196.2
+      ],
+      "bbox": [
+        323,
+        176,
+        43,
+        41
+      ],
+      "id": "o3",
+      "table_cm": [
+        17.6,
+        4.6
+      ],
+      "kind": null
+    }
+  ]
+}

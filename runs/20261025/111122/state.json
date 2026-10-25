@@ -1,0 +1,36 @@
+{
+  "id": "20261025-111122",
+  "timestamp": "2026-10-25T11:11:22",
+  "note": "sort r01",
+  "image": "runs/20261025/111122/frame.jpg",
+  "table_cm": [
+    22,
+    15
+  ],
+  "objects": [
+    {
+      "colors": [
+        "pink"
+      ],
+      "shape": "round",
+      "circularity": 0.874,
+      "area_px": 1357,
+      "pixel": [
+        209.5,
+        229.4
+      ],
+      "bbox": [
+        188,
+        209,
+        43,
+        41
+      ],
+      "id": "o1",
+      "table_cm": [
+        6.2,
+        7.3
+      ],
+      "kind": null
+    }
+  ]
+}
