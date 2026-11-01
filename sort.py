@@ -4,6 +4,7 @@
   python sort.py --rule r01 --step       # 物体ごとに Enter を待ってから動かす（最初はこれ）
   python sort.py --rule r07 --min-conf 0.7 --judge   # 自信が低い物は運ばずに残す。成否を手入力で記録
   python sort.py --rule r01 --state runs/20261024/191139/state.json --dry-run   # 保存済みの状態で
+  python sort.py --rule r01 --backend astra --step --judge   # 判断を GPT-6 Astra に替える（jev も可）
 
 Ctrl+C で止めると、待機姿勢に戻ってから終了する。
 """
@@ -15,7 +16,7 @@ import yaml
 
 from arm import connect_follower, grasp_pose_at, lifted, load_poses, move_to, travel
 from common import ROOT, load_config
-from decide import decide_one
+from decide import BACKENDS, decide_one
 from record import capture_state
 
 
@@ -60,10 +61,12 @@ def main():
     ap.add_argument("--step", action="store_true", help="物体ごとに Enter を待つ")
     ap.add_argument("--min-conf", type=float, default=0.0, help="これ未満の自信の物は運ばない")
     ap.add_argument("--judge", action="store_true", help="運ぶたびに成否を入力して記録する")
+    ap.add_argument("--backend", choices=BACKENDS, help="判断に使うモデル（既定は config.yaml）")
     ap.add_argument("--note", default="")
     args = ap.parse_args()
 
     cfg = load_config()
+    backend = args.backend or cfg["decide"]["backend"]
     poses = load_poses(cfg)
     with open(ROOT / "rules.yaml") as f:
         rule = next((r for r in yaml.safe_load(f) if r["id"] == args.rule), None)
@@ -80,13 +83,13 @@ def main():
                 state = json.load(f)
             run_dir = ROOT / state["image"].rsplit("/", 1)[0]
         else:
-            state, run_dir = capture_state(cfg, note=args.note or f"sort {rule['id']}")
+            state, run_dir = capture_state(cfg, note=args.note or f"sort {rule['id']} {backend}")
         if not state["objects"]:
             print("物体がありません")
             return
 
-        print(f"ルール {rule['id']}: {rule['text']}")
-        decision = decide_one(cfg, state, rule)
+        print(f"ルール {rule['id']}: {rule['text']}（判断: {backend}）")
+        decision = decide_one(cfg, state, rule, backend)
         # 一括判断（decide.py）の集計に混ざらないよう別ファイルに残す
         with open(run_dir / "sort_decisions.jsonl", "a") as f:
             f.write(json.dumps(decision, ensure_ascii=False) + "\n")
@@ -111,7 +114,7 @@ def main():
             t0 = time.time()
             pick_and_place(robot, cfg, poses, s)
             travel(robot, cfg, poses, poses["home"])
-            rec = {"state_id": state["id"], "rule_id": rule["id"], "object": s["obj"]["id"],
+            rec = {"state_id": state["id"], "rule_id": rule["id"], "backend": backend, "object": s["obj"]["id"],
                    "colors": s["obj"]["colors"], "bin": s["bin"], "confidence": s["confidence"],
                    "seconds": round(time.time() - t0, 1)}
             if args.judge:

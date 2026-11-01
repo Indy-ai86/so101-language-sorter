@@ -182,6 +182,11 @@ def test_bins(robot, cfg, poses):
         above = lifted(bin_pose, a["bin_hover_deg"])
         travel(robot, cfg, poses, {**above, "gripper": closed}, speed_scale=0.5)
         move_to(robot, cfg, {**bin_pose, "gripper": closed}, speed_scale=0.3)
+        # 下ろした所で止めて、指令と実際の関節角の差を出す。差が大きい関節は、届いていない（垂れている・何かに当たっている）。
+        # 差が小さいのに位置がずれるなら、モーターと腕の取り付け（ねじ・ホーン）がずれている
+        time.sleep(1.0)
+        now = read(robot)
+        print("  指令との差（度）: " + "  ".join(f"{j} {now[j] - bin_pose[j]:+.1f}" for j in JOINTS if j != "gripper"))
         move_to(robot, cfg, {**bin_pose, "gripper": opened}, speed_scale=0.5)
         time.sleep(0.5)
         move_to(robot, cfg, {**bin_pose, "gripper": closed}, speed_scale=0.5)

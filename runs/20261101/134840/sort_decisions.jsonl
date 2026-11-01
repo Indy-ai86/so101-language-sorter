@@ -1,0 +1,1 @@
+{"state_id": "20261101-134840", "rule_id": "r04", "rule": "暖色（赤・オレンジ・黄・ピンク）の物は左へ、寒色（青・緑）の物は右へ。", "backend": "fable", "answer": {"o1": {"bin": "right", "confidence": 0.95}, "o2": {"bin": "left", "confidence": 0.95}, "o3": {"bin": "left", "confidence": 0.95}}, "model": "claude-fable-5-1", "cost_usd": 0.027498999999999996, "latency_s": 4.01}

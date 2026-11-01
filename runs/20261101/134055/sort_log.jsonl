@@ -1,0 +1,3 @@
+{"state_id": "20261101-134055", "rule_id": "r01", "backend": "fable", "object": "o1", "colors": ["pink"], "bin": "left", "confidence": 0.98, "seconds": 25.7, "result": "o"}
+{"state_id": "20261101-134055", "rule_id": "r01", "backend": "fable", "object": "o2", "colors": ["green"], "bin": "right", "confidence": 0.98, "seconds": 28.8, "result": "o"}
+{"state_id": "20261101-134055", "rule_id": "r01", "backend": "fable", "object": "o3", "colors": ["yellow"], "bin": "right", "confidence": 0.98, "seconds": 29.5, "result": "o"}

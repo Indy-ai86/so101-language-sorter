@@ -54,8 +54,15 @@ def load_states():
     return states
 
 
-def eval_decisions(states):
-    rows = [json.loads(l) for f in ROOT.glob("runs/*/decisions.jsonl") for l in f.read_text().splitlines()]
+def load_decisions():
+    return [json.loads(l) for f in ROOT.glob("runs/*/decisions.jsonl") for l in f.read_text().splitlines()
+            if not json.loads(l).get("error")]
+
+
+def eval_decisions(states, rows, backend):
+    rows = [d for d in rows if d.get("backend", "fable") == backend]
+    if not rows:
+        return
     per_rule = defaultdict(lambda: Counter())
     confs = defaultdict(list)
     wrong = []
@@ -73,7 +80,7 @@ def eval_decisions(states):
             per_rule[d["rule_id"]]["ok" if ok else "ng"] += 1
             if not ok:
                 wrong.append((d["state_id"], d["rule_id"], o["id"], o["colors"], o["table_cm"], a, e))
-    print(f"判断の一括評価：{len(rows)} 回の呼び出し、費用 ${sum(d['cost_usd'] for d in rows):.2f}、"
+    print(f"\n判断の一括評価（{backend}）：{len(rows)} 回の呼び出し、費用 ${sum(d.get('cost_usd') or 0 for d in rows):.2f}、"
           f"平均 {sum(d['latency_s'] for d in rows) / len(rows):.1f} 秒")
     print("| ルール | 正解 | 不正解 | 採点外 | 自信の平均 |")
     print("|---|---|---|---|---|")
@@ -87,6 +94,34 @@ def eval_decisions(states):
         print("  不正解:", w)
 
 
+def compare_backends(states, rows):
+    """同じ状態・同じルールに複数の判断先が答えていれば、置き場が分かれた物を並べる。"""
+    by_key = defaultdict(dict)
+    for d in rows:
+        by_key[(d["state_id"], d["rule_id"])][d.get("backend", "fable")] = d["answer"]
+    multi = {k: v for k, v in by_key.items() if len(v) > 1}
+    if not multi:
+        return
+    backends = sorted({b for v in multi.values() for b in v})
+    agree = Counter()
+    diffs = []
+    for (sid, rid), answers in sorted(multi.items()):
+        objs = states[sid]["objects"]
+        for o in objs:
+            bins = {b: answers[b][o["id"]]["bin"] for b in answers}
+            same = len(set(bins.values())) == 1
+            agree["same" if same else "diff"] += 1
+            if not same:
+                e = expected(rid, o, objs)
+                diffs.append((sid, rid, o["id"], "+".join(o["colors"]), e,
+                              {b: f"{a['bin']}({a['confidence']:.2f})" for b, a in
+                               ((b, answers[b][o["id"]]) for b in backends if b in answers)}))
+    print(f"\n判断先の比較（{' / '.join(backends)}、同じ状態と同じルールに答えた {len(multi)} 組）："
+          f"物体 {sum(agree.values())} 個のうち一致 {agree['same']}、不一致 {agree['diff']}")
+    for d in diffs:
+        print(f"  {d[0]} {d[1]} {d[2]} {d[3]} 正解={d[4]} {d[5]}")
+
+
 def eval_runs(states):
     print("\n実機の試行（sort.py --judge）")
     recs = []
@@ -95,13 +130,18 @@ def eval_runs(states):
             r = json.loads(line)
             recs.append(r)
     names = {"o": "成功", "g": "掴めず", "d": "途中で落下", "b": "置き場を外した"}
-    c = Counter(r.get("result") or "記録なし" for r in recs)
-    print(f"全 {len(recs)} 回:", ", ".join(f"{names.get(k, k)} {v}" for k, v in c.items()))
+    for backend in sorted({r.get("backend", "fable") for r in recs}):
+        rs = [r for r in recs if r.get("backend", "fable") == backend]
+        c = Counter(r.get("result") or "記録なし" for r in rs)
+        print(f"{backend} 全 {len(rs)} 回:", ", ".join(f"{names.get(k, k)} {v}" for k, v in c.items()))
     for r in recs:
-        print(f"  {r['state_id']} {r['rule_id']} {'+'.join(r['colors'])} → {r['bin']} {names.get(r.get('result'), r.get('result'))}")
+        print(f"  {r['state_id']} {r['rule_id']} {r.get('backend', 'fable')} {'+'.join(r['colors'])} → {r['bin']} {names.get(r.get('result'), r.get('result'))}")
 
 
 if __name__ == "__main__":
     st = load_states()
-    eval_decisions(st)
+    rows = load_decisions()
+    for b in sorted({d.get("backend", "fable") for d in rows}):
+        eval_decisions(st, rows, b)
+    compare_backends(st, rows)
     eval_runs(st)

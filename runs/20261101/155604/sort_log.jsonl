@@ -1,0 +1,3 @@
+{"state_id": "20261101-155604", "rule_id": "r04", "backend": "astra", "object": "o1", "colors": ["green"], "bin": "right", "confidence": 1, "seconds": 29.1, "result": "o"}
+{"state_id": "20261101-155604", "rule_id": "r04", "backend": "astra", "object": "o2", "colors": ["pink"], "bin": "left", "confidence": 1, "seconds": 25.6, "result": "o"}
+{"state_id": "20261101-155604", "rule_id": "r04", "backend": "astra", "object": "o3", "colors": ["yellow"], "bin": "left", "confidence": 1, "seconds": 27.0, "result": "o"}

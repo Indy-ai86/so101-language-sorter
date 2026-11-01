@@ -1,0 +1,3 @@
+{"state_id": "20261101-143536", "rule_id": "r01", "backend": "jev", "object": "o1", "colors": ["pink"], "bin": "left", "confidence": 1.0, "seconds": 25.9, "result": "o"}
+{"state_id": "20261101-143536", "rule_id": "r01", "backend": "jev", "object": "o2", "colors": ["green"], "bin": "right", "confidence": 1.0, "seconds": 29.0, "result": "o"}
+{"state_id": "20261101-143536", "rule_id": "r01", "backend": "jev", "object": "o3", "colors": ["yellow"], "bin": "right", "confidence": 1.0, "seconds": 29.4, "result": "o"}

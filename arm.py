@@ -100,10 +100,15 @@ def grasp_pose_at(cfg, poses, x, y):
     a = cfg["arm"]
     gx, gy = a["grid_x"], a["grid_y"]
     dx, dy = a.get("grasp_offset_cm", [0.0, 0.0])
-    x = float(np.clip(x + dx, gx[0], gx[-1]))
+    # 列ごとのずらし量があれば、物体の x で補間して dx の代わりに使う（左端は旋回で爪の向きが変わり、余裕が小さい）
+    if a.get("grasp_offset_x_by_col"):
+        dx = float(np.interp(x, gx, a["grasp_offset_x_by_col"]))
+    # 教えた点の外側も、端のマス目の傾きのまま少しだけ延長する（端に寄せると、外にある物の手前に下りてしまう）
+    m = float(a.get("extrapolate_left_cm", 0.0))
+    x = float(np.clip(x + dx, gx[0] - m, gx[-1]))
     y = float(np.clip(y + dy, gy[0], gy[-1]))
-    i = min(int(np.searchsorted(gx, x, side="right")) - 1, len(gx) - 2)
-    k = min(int(np.searchsorted(gy, y, side="right")) - 1, len(gy) - 2)
+    i = min(max(int(np.searchsorted(gx, x, side="right")) - 1, 0), len(gx) - 2)
+    k = min(max(int(np.searchsorted(gy, y, side="right")) - 1, 0), len(gy) - 2)
     tx = (x - gx[i]) / (gx[i + 1] - gx[i])
     ty = (y - gy[k]) / (gy[k + 1] - gy[k])
 

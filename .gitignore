@@ -10,3 +10,9 @@ runs/**/*.jpg
 # 動画は別に提出する
 video/out/
 report/report.html
+# API キー
+keys.env
+report/report_vol2.html
+report/report_vol3.html
+report/report_vol4.html
+report/report_vol5.html

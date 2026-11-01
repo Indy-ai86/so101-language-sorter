@@ -6,12 +6,21 @@
   python decide.py runs/20261012/states.jsonl                # 全ルール
   python decide.py runs/20261012/states.jsonl --rules r01,r07
   python decide.py runs/20261012/143000/state.json --dry-run  # 送る内容だけ表示
+  python decide.py runs/20261025/states.jsonl --backend astra   # 判断先を替える（fable / astra / jev）
+
+astra（OpenAI GPT-6 Astra）は Codex CLI をヘッドレスで呼ぶ（ログイン中の ChatGPT アカウントの利用枠。キー不要）。
+astra-api は同じモデルを API で呼ぶ予備。jev（TypeSafe）と astra-api は API キーが要る。環境変数か、
+このフォルダの keys.env（OPENAI_API_KEY=... / TYPESAFE_API_KEY=...、git には入れない）に置く。
 
 結果は入力と同じフォルダの decisions.jsonl に追記。済んだ組み合わせは飛ばすので、途中で止めても再開できる。
 """
 import argparse
 import json
+import os
+import signal
 import subprocess
+import urllib.error
+import urllib.request
 import tempfile
 import time
 from pathlib import Path
@@ -77,7 +86,117 @@ def decide_fable(cfg, system, user, schema):
                                     "cost_usd": d.get("total_cost_usd")}
 
 
-BACKENDS = {"fable": decide_fable}
+def api_key(name):
+    """環境変数になければ keys.env（KEY=VALUE の行）から読む。"""
+    if os.environ.get(name):
+        return os.environ[name]
+    env = ROOT / "keys.env"
+    if env.exists():
+        for line in env.read_text().splitlines():
+            if line.startswith(name + "="):
+                return line.split("=", 1)[1].strip().strip('"')
+    raise RuntimeError(f"{name} がありません（環境変数か {env.name} に置く）")
+
+
+def post_json(url, body, headers, timeout):
+    req = urllib.request.Request(url, data=json.dumps(body).encode(), method="POST",
+                                 headers={"Content-Type": "application/json", **headers})
+    try:
+        with urllib.request.urlopen(req, timeout=timeout) as r:
+            return json.loads(r.read())
+    except urllib.error.HTTPError as e:
+        raise RuntimeError(f"HTTP {e.code}: {e.read()[:300].decode(errors='replace')}") from None
+
+
+def decide_astra(cfg, system, user, schema):
+    """Codex CLI をヘッドレスで呼ぶ（fable の claude -p に相当）。
+
+    Codex はコードを書く agent なので、system 文は本文の先頭に置き、道具を使わず答えるよう添える。
+    サンドボックスは読み取り専用、セッションは残さず、個人の config.toml（hooks など）も読まない。
+    """
+    d = cfg["decide"]
+    prompt = f"{system}\n\nこれは質問です。ファイルやコマンドは使わず、与えられた情報だけで答えてください。\n\n{user}"
+    with tempfile.TemporaryDirectory() as tmp:
+        sch, out = Path(tmp) / "schema.json", Path(tmp) / "answer.json"
+        sch.write_text(json.dumps(schema))
+        cmd = ["codex", "exec", "-m", d["astra_model"], "--ephemeral", "--ignore-user-config",
+               "--skip-git-repo-check", "-s", "read-only", "-C", tmp, "--color", "never",
+               "--output-schema", str(sch), "-o", str(out), "--json", prompt]
+        # stdin を閉じておかないと、端末のない所から呼んだとき codex が入力の終わりを待ち続ける。
+        # 時間切れのときは node の子（本体のバイナリ）ごと止めるため、プロセスグループで起動する
+        proc = subprocess.Popen(cmd, stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                                text=True, start_new_session=True)
+        try:
+            stdout, stderr = proc.communicate(timeout=cfg["decide"]["timeout_s"] * 3)
+        except subprocess.TimeoutExpired:
+            os.killpg(proc.pid, signal.SIGKILL)
+            proc.communicate()
+            raise RuntimeError("codex が時間内に答えませんでした") from None
+        if proc.returncode != 0 or not out.exists():
+            # codex の stderr は進行表示が多いので、ERROR の行だけ拾う（例：ワークスペースの支出上限）
+            errs = [l for l in stderr.splitlines() if l.startswith("ERROR")]
+            raise RuntimeError(errs[-1] if errs else (stderr or stdout)[-300:])
+        answer = json.loads(out.read_text())
+        # --json の行から使用トークンを拾う（費用は利用枠なので記録しない）
+        usage = None
+        for line in stdout.splitlines():
+            try:
+                ev = json.loads(line)
+            except ValueError:
+                continue
+            if ev.get("type") == "turn.completed":
+                usage = ev.get("usage")
+    return answer, {"model": d["astra_model"], "cost_usd": None, "usage": usage}
+
+
+def decide_astra_api(cfg, system, user, schema):
+    """OpenAI の Responses API で同じモデルを呼ぶ予備。fable と同じ system / user / JSON スキーマを渡す。"""
+    d = cfg["decide"]
+    body = {
+        "model": d["astra_model"],
+        "instructions": system,
+        "input": user,
+        "text": {"format": {"type": "json_schema", "name": "sorting", "schema": schema, "strict": True}},
+    }
+    r = post_json("https://api.openai.com/v1/responses", body,
+                  {"Authorization": f"Bearer {api_key('OPENAI_API_KEY')}"}, d["timeout_s"])
+    text = next((c["text"] for item in r.get("output", []) if item.get("type") == "message"
+                 for c in item.get("content", []) if c.get("type") == "output_text"), None)
+    if text is None or r.get("status") == "incomplete":
+        raise RuntimeError(f"出力なし: {json.dumps(r)[:300]}")
+    u = r.get("usage", {})
+    pin, pout = d["astra_price_per_m"]
+    cost = (u.get("input_tokens", 0) * pin + u.get("output_tokens", 0) * pout) / 1e6
+    return json.loads(text), {"model": r.get("model", d["astra_model"]), "cost_usd": round(cost, 5),
+                              "usage": u}
+
+
+def decide_jev(cfg, system, user, schema):
+    """TypeSafe の System One。文章を生成せず、物体ごとに置き場を選ばせて確率をもらう。
+
+    state に場面（system の説明＋ルール＋物体一覧）を入れ、物体 1 つにつき choice の質問を 1 つ立てる。
+    質問は同じ state に対して独立に答えられる（他の物体と比べるルールでも state に全物体があるので答えられる）。
+    """
+    d = cfg["decide"]
+    bins = list(schema["properties"][next(iter(schema["properties"]))]["properties"]["bin"]["enum"])
+    ids = list(schema["properties"])
+    questions = {i: {"type": "choice",
+                     "instructions": f"ルールに従うと、物体 {i} はどの置き場に入れるべきか。",
+                     "criteria": {b: f"置き場 {b}" for b in bins}} for i in ids}
+    body = {"model": d["jev_model"], "state": f"{system}\n\n{user}", "questions": questions}
+    r = post_json("https://api.typesafe.ai/v1/systemone", body,
+                  {"Authorization": f"Bearer {api_key('TYPESAFE_API_KEY')}"}, d["timeout_s"])
+    answer = {}
+    for i in ids:
+        a = r["answers"][i]
+        answer[i] = {"bin": a["choice"], "confidence": round(a["confidence"], 3),
+                     "probabilities": {k: round(v, 3) for k, v in a["probabilities"].items()}}
+    u = r.get("usage", {})
+    cost = u.get("input_tokens", 0) * d["jev_price_per_m_in"] / 1e6
+    return answer, {"model": r.get("model", d["jev_model"]), "cost_usd": round(cost, 6), "usage": u}
+
+
+BACKENDS = {"fable": decide_fable, "astra": decide_astra, "astra-api": decide_astra_api, "jev": decide_jev}
 
 
 def decide_one(cfg, state, rule, backend=None):
@@ -97,7 +216,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("states", help="states.jsonl または state.json")
     ap.add_argument("--rules", help="カンマ区切りのルール ID（省略で全部）")
-    ap.add_argument("--backend", help="fable（既定は config.yaml の decide.backend）")
+    ap.add_argument("--backend", choices=BACKENDS, help="fable / astra / astra-api / jev（既定は config.yaml の decide.backend）")
     ap.add_argument("--dry-run", action="store_true")
     args = ap.parse_args()
 

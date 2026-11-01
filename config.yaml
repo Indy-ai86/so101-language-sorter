@@ -36,8 +36,12 @@ colors:
 bins: [left, center, right]
 
 decide:
-  backend: fable
+  backend: fable            # fable / astra / jev。sort.py と decide.py の --backend で上書きできる
   fable_model: claude-fable-5-1
+  astra_model: gpt-6-astra  # astra は Codex CLI（ChatGPT アカウント）で呼ぶ。astra-api は OPENAI_API_KEY（環境変数か keys.env）
+  astra_price_per_m: [10.0, 50.0]   # astra-api の入力・出力の 100 万トークン単価（USD、2026-10 時点の公開表）。費用の見積りにだけ使う
+  jev_model: jev-latest     # TypeSafe System One。キーは TYPESAFE_API_KEY
+  jev_price_per_m_in: 0.042 # 入力のみ課金（出力は無料）
   timeout_s: 60
 
 arm:
@@ -63,6 +67,12 @@ arm:
   gripper_release: 35
   # 記録した姿勢が狙いの点から一定にずれているとき、物体の位置をこの分だけずらしてから補間する（check_grasp.py で測る）
   grasp_offset_cm: [0.5, 0.0]
+  # 横のずらし量を列（grid_x の 3 点）ごとに変える。左端の点では爪が狙いより約 1cm カップ（地図の10番）側に下りる。
+  # 横 2.2cm のアヒルで、狙い 3.0 も 2.4 もカップ側にずれた。前回は狙い 3.0 で 1.9〜2.0 は掴め、2.4 は外れた（2026-11-01）
+  grasp_offset_x_by_col: [1.2, 0.5, 0.5]
+  # 左端の点より外の物は、端のマス目の傾きのまま延長して狙う幅（cm）。0 なら端に寄せる。
+  # 延長した狙い（2.4・2.8）はどちらもカップ側に外れ、成功は狙い 3.0 以上だけだったので使わない（2026-11-01）
+  extrapolate_left_cm: 0
   # 掴む高さが足りないとき、肩をこの角度だけ下げる（正で下がる。1 度でおよそ 4mm。下げすぎると机を押すので少しずつ）
   grasp_lower_deg: 0
   # 記録した閉じ値（アヒルを握った状態で読んだ値）をそのまま指令すると押す力が出ず、握りが甘い。この分だけ深く閉じる

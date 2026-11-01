@@ -1,0 +1,84 @@
+{
+  "id": "20261101-134438",
+  "timestamp": "2026-11-01T13:44:38",
+  "note": "sort r09 fable",
+  "image": "runs/20261101/134438/frame.jpg",
+  "table_cm": [
+    22,
+    15
+  ],
+  "objects": [
+    {
+      "colors": [
+        "green"
+      ],
+      "shape": "round",
+      "circularity": 0.815,
+      "area_px": 1188,
+      "pixel": [
+        169.5,
+        228.9
+      ],
+      "bbox": [
+        153,
+        209,
+        36,
+        40
+      ],
+      "id": "o1",
+      "table_cm": [
+        1.4,
+        6.9
+      ],
+      "kind": null
+    },
+    {
+      "colors": [
+        "yellow"
+      ],
+      "shape": "round",
+      "circularity": 0.857,
+      "area_px": 1165,
+      "pixel": [
+        263.5,
+        228.1
+      ],
+      "bbox": [
+        243,
+        210,
+        42,
+        37
+      ],
+      "id": "o2",
+      "table_cm": [
+        9.7,
+        7.0
+      ],
+      "kind": null
+    },
+    {
+      "colors": [
+        "pink"
+      ],
+      "shape": "round",
+      "circularity": 0.873,
+      "area_px": 1221,
+      "pixel": [
+        353.8,
+        226.8
+      ],
+      "bbox": [
+        334,
+        208,
+        41,
+        39
+      ],
+      "id": "o3",
+      "table_cm": [
+        18.0,
+        7.1
+      ],
+      "kind": null
+    }
+  ]
+}
