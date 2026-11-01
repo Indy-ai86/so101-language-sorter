@@ -6,7 +6,7 @@ Physical AI 講座 2026 応用編1 の最終課題。日本語で書いた仕分
 - 判断：判断モデルが物体ごとに置き場と確からしさ（0〜1）を返す。Claude Fable 5.1・GPT-6 Astra・Jev（TypeSafe）を切り替えられる
 - 動作：リーダーアームで教えた 3×3 点の姿勢を双線形補間（学習・逆運動学なし）
 
-結果とその分析は [report/report_vol5.pdf](report/report_vol5.pdf)（3モデルの比較）にある。最初の版（Fable のみ）は [report/report.pdf](report/report.pdf)。
+結果とその分析は [report/72306.pdf](report/72306.pdf)（3モデルの比較。元の文書は `report/report_vol5.md`）にある。最初の版（Fable のみ）は [report/report.pdf](report/report.pdf)。
 
 ## 結果
 
